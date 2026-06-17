@@ -66,9 +66,6 @@ done < <(echo "$gh_ranges" | jq -r '(.web + .api + .git)[]' | aggregate -q)
 allowed_domains=(
     "api.anthropic.com"
     "platform.claude.com"
-    "pypi.org"
-    "files.pythonhosted.org"
-    "registry.npmjs.org"
 )
 
 # Resolve and add other allowed domains
