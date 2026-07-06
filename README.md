@@ -35,6 +35,36 @@ Then tell VS Code to use Podman instead of Docker. Add this to your VS Code `set
 
 Alternatively, open VS Code Settings (`Ctrl+,` / `Cmd+,`) and set **Dev > Containers: Docker Path** to `podman`.
 
+#### Required on macOS: make the Podman machine rootful
+
+On macOS (and Windows), Podman runs inside a Linux VM (`podman machine`). By default that machine is **rootless**, which breaks bind-mounted workspace files — see [Why rootless fails](#why-rootless-fails) below. Switch the machine to rootful **once** before opening the container:
+
+```bash
+podman machine stop
+podman machine set --rootful
+podman machine start
+```
+
+You can verify the workspace mounts with correct, mappable ownership by running:
+
+```bash
+podman run --rm -v "$PWD":/w docker.io/library/alpine ls -lan /w
+```
+
+Your files should show a real uid (e.g. your host `501`), **not** `65534`. If you see `65534`, the machine is still rootless.
+
+On native Linux, Podman has no VM and bind mounts work directly — no rootful step is needed.
+
+#### Why rootless fails
+
+Under a rootless `podman machine`, the VM's virtiofs layer cannot map your host user (e.g. macOS uid `501`) into the container. Your host-created files (`.git`, project files) arrive owned by `65534` ("nobody"), which is **outside** the container's user-namespace range — so the container's `vscode` user can neither own nor `chown` them, and Git reports dubious-ownership errors. This is why the earlier rootless config leaned on `--userns=keep-id` and `idmap`: workarounds that still could not map the unmappable `65534` files.
+
+A **rootful** machine behaves much like Docker Desktop's VM: it runs the container as real root inside the VM, so host files arrive with mappable ownership and the container's `postCreateCommand` `chown` can take effect. That is why the Docker path worked out of the box and rootless Podman did not.
+
+One residual difference from Docker Desktop remains, and the Podman config accounts for it: Podman's virtiofs share refuses to let even container-root `chown` your Mac-origin **read-only git objects** (`.git/objects/*`, mode `0444`) — a `chown -R /workspace` will report `Permission denied` on them. Docker Desktop's file-sharing layer fakes a successful chown; virtiofs does not. This is harmless — those objects are world-readable and git only ever *reads* existing objects — so `podman/devcontainer.json` runs the workspace chown fault-tolerantly (`; ... 2>/dev/null`) and relies on `git config --global --add safe.directory '*'` for the rest. The files that git actually needs to write (config, index, refs, working tree) are not read-only and chown normally.
+
+The `NET_ADMIN`/`NET_RAW` capabilities used by the firewall are scoped to the container's own network namespace and grant no privilege on your host.
+
 ---
 
 ## Using the container
