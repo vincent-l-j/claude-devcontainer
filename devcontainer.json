@@ -1,6 +1,9 @@
 {
   "name": "Claude Code (Podman)",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "build": {
+    "dockerfile": "Containerfile",
+    "context": "."
+  },
 
   "features": {
     "ghcr.io/devcontainers/features/node:1": {},
