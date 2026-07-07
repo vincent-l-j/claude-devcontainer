@@ -5,6 +5,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
     jq \
+    # firewall networking
+    ipset \
+    iptables \
+    dnsutils \
+    aggregate \
     && rm -rf /var/lib/apt/lists/*
 
 # Create directories and set ownership (combined for fewer layers)
@@ -49,5 +54,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 USER vscode
+
+RUN git config --global --add safe.directory '*'
 
 ENV EDITOR=vim

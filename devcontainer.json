@@ -6,11 +6,12 @@
   },
 
   "features": {
-    "ghcr.io/devcontainers/features/node:1": {},
-    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
+    "ghcr.io/devcontainers/features/node:1": {}
   },
 
   "runArgs": ["--cap-add=NET_ADMIN", "--cap-add=NET_RAW"],
+
+  "postStartCommand": "sudo bash /workspace/.devcontainer/init-firewall.sh",
 
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=delegated",
   "workspaceFolder": "/workspace",
@@ -27,9 +28,6 @@
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
     "DISABLE_AUTOUPDATER": "1"
   },
-
-  "postCreateCommand": "git config --global --add safe.directory '*'",
-  "postStartCommand": "sudo bash .devcontainer/init-firewall.sh && echo 'Claude Code container ready. Run: claude'",
 
   "customizations": {
     "vscode": {
