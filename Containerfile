@@ -44,8 +44,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-USER vscode
-
 RUN git config --global --add safe.directory '*'
+
+USER vscode
 
 ENV EDITOR=vim
