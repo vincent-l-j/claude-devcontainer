@@ -20,6 +20,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # --- Unprivileged user ---
 # HOST_UID must match the host user's uid so bind-mounted files are
 # already owned by claude - no chown needed at runtime.
+# Ubuntu 24.04 images ship a default "ubuntu" user at uid 1000, which
+# collides with HOST_UID's default - remove it first.
+RUN userdel -r ubuntu 2>/dev/null || true
+
 ARG HOST_UID=1000
 RUN useradd -ms /bin/bash -u ${HOST_UID} claude && \
     mkdir -p /home/claude/.local/bin && \
