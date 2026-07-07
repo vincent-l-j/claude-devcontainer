@@ -25,10 +25,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN userdel -r ubuntu 2>/dev/null || true
 
 ARG HOST_UID=1000
-RUN useradd -ms /bin/bash -u ${HOST_UID} claude && \
-    mkdir -p /home/claude/.local/bin && \
-    chown -R claude:claude /home/claude
-USER claude
+RUN useradd -ms /bin/bash -u ${HOST_UID} vscode && \
+    mkdir -p /home/vscode/.local/bin && \
+    chown -R vscode:vscode /home/vscode
+USER vscode
 
 # --- Claude Code CLI (installed as the claude user so it lands in ~/.local/bin) ---
 # This layer is intentionally placed before the common system packages so that
@@ -36,7 +36,7 @@ USER claude
 RUN curl -fsSL https://claude.ai/install.sh | bash
 
 USER root
-RUN cp /home/claude/.local/bin/claude /usr/local/bin/claude && \
+RUN cp /home/vscode/.local/bin/claude /usr/local/bin/claude && \
     chmod +x /usr/local/bin/claude
 
 # --- Node.js 22 (LTS) via NodeSource ---
@@ -62,9 +62,9 @@ RUN git config --system user.email "claude@sandbox" && \
 
 WORKDIR /app
 
-USER claude
+USER vscode
 
-ENV PATH="/home/claude/.local/bin:${PATH}"
+ENV PATH="/home/vscode/.local/bin:${PATH}"
 ENV EDITOR=vim
 
 CMD ["claude"]
