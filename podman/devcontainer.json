@@ -24,7 +24,7 @@
     "DISABLE_AUTOUPDATER": "1"
   },
 
-  "postCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.claude; sudo chown -R vscode:vscode /workspace 2>/dev/null; git config --global --add safe.directory '*'",
+  "postCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.claude; sudo chown -R vscode:vscode /workspace 2>/dev/null; git config --global --add safe.directory '*'; sudo install -m 0644 .devcontainer/claude-clear-ambient-caps.sh /etc/profile.d/10-claude-clear-ambient-caps.sh; grep -q claude-clear-ambient-caps /etc/bash.bashrc || echo '. /etc/profile.d/10-claude-clear-ambient-caps.sh' | sudo tee -a /etc/bash.bashrc >/dev/null",
   "postStartCommand": "sudo bash .devcontainer/init-firewall.sh && echo 'Claude Code container ready. Run: claude'",
 
   "customizations": {
