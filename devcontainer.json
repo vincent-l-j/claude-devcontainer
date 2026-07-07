@@ -12,14 +12,15 @@
 
   "runArgs": ["--cap-add=NET_ADMIN", "--cap-add=NET_RAW"],
 
-  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=delegated",
   "workspaceFolder": "/workspace",
 
   "mounts": [
-    "source=claude-code-config-${devcontainerId},target=/home/vscode/.claude,type=volume"
+    "source=devc-${localWorkspaceFolderBasename}-bashhistory-${devcontainerId},target=/commandhistory,type=volume",
+    "source=${localWorkspaceFolder}/.devcontainer,target=/workspace/.devcontainer,type=bind,readonly",
+    "source=devc-${localWorkspaceFolderBasename}-config-${devcontainerId},target=/home/vscode/.claude,type=volume"
   ],
 
-  "containerUser": "vscode",
   "remoteUser": "vscode",
 
   "containerEnv": {
@@ -27,7 +28,7 @@
     "DISABLE_AUTOUPDATER": "1"
   },
 
-  "postCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.claude; sudo chown -R vscode:vscode /workspace 2>/dev/null; git config --global --add safe.directory '*'; sudo install -m 0644 .devcontainer/claude-clear-ambient-caps.sh /etc/profile.d/10-claude-clear-ambient-caps.sh; grep -q claude-clear-ambient-caps /etc/bash.bashrc || echo '. /etc/profile.d/10-claude-clear-ambient-caps.sh' | sudo tee -a /etc/bash.bashrc >/dev/null",
+  "postCreateCommand": "git config --global --add safe.directory '*'",
   "postStartCommand": "sudo bash .devcontainer/init-firewall.sh && echo 'Claude Code container ready. Run: claude'",
 
   "customizations": {

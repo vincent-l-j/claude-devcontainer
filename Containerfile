@@ -1,14 +1,4 @@
-# base/Containerfile
-#
-# Claude Code sandbox - base image.
-# Mounts the current project directory at /app.
-#
-# Build: ./sandbox.sh build
-# Run:   ./sandbox.sh run --dir ~/projects/my-project
-
-FROM ubuntu:24.04
-
-ENV DEBIAN_FRONTEND=noninteractive
+FROM mcr.microsoft.com/devcontainers/base:ubuntu24.04@sha256:4bcb1b466771b1ba1ea110e2a27daea2f6093f9527fb75ee59703ec89b5561cb
 
 # --- Bootstrap packages (needed to install Claude Code CLI) ---
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -17,18 +7,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     jq \
     && rm -rf /var/lib/apt/lists/*
 
-# --- Unprivileged user ---
-# HOST_UID must match the host user's uid so bind-mounted files are
-# already owned by claude - no chown needed at runtime.
-# Ubuntu 24.04 images ship a default "ubuntu" user at uid 1000, which
-# collides with HOST_UID's default - remove it first.
-RUN userdel -r ubuntu 2>/dev/null || true
+# Create directories and set ownership (combined for fewer layers)
+RUN mkdir -p /commandhistory /workspace /home/vscode/.claude && \
+  touch /commandhistory/.bash_history && \
+  touch /commandhistory/.zsh_history && \
+  chown -R vscode:vscode /commandhistory /workspace /home/vscode/.claude
 
-ARG HOST_UID=1000
-RUN useradd -ms /bin/bash -u ${HOST_UID} vscode && \
-    mkdir -p /home/vscode/.local/bin && \
-    chown -R vscode:vscode /home/vscode
+WORKDIR /workspace
+
+# Switch to non-root user for remaining setup
 USER vscode
+
+# Set PATH early so claude and other user-installed binaries are available
+ENV PATH="/home/vscode/.local/bin:$PATH"
 
 # --- Claude Code CLI (installed as the claude user so it lands in ~/.local/bin) ---
 # This layer is intentionally placed before the common system packages so that
@@ -57,11 +48,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python-is-python3 \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
-
 USER vscode
 
-ENV PATH="/home/vscode/.local/bin:${PATH}"
 ENV EDITOR=vim
-
-CMD ["claude"]
