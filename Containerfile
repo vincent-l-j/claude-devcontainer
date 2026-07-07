@@ -57,9 +57,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python-is-python3 \
     && rm -rf /var/lib/apt/lists/*
 
-RUN git config --system user.email "claude@sandbox" && \
-    git config --system user.name "claude"
-
 WORKDIR /app
 
 USER vscode
