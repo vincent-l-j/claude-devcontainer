@@ -35,11 +35,6 @@ USER root
 RUN cp /home/vscode/.local/bin/claude /usr/local/bin/claude && \
     chmod +x /usr/local/bin/claude
 
-# --- Node.js 22 (LTS) via NodeSource ---
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
-    && apt-get install -y nodejs \
-    && rm -rf /var/lib/apt/lists/*
-
 # --- Common system packages ---
 # Add new packages here. Layers above (including the CLI install) stay cached.
 RUN apt-get update && apt-get install -y --no-install-recommends \
