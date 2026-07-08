@@ -1,7 +1,7 @@
 {
   "name": "Claude Code (Podman)",
   "build": {
-    "dockerfile": "Containerfile",
+    "dockerfile": "Dockerfile",
     "context": "."
   },
 
