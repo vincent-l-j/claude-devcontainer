@@ -5,6 +5,9 @@ IFS=$'\n\t'       # Stricter word splitting
 allowed_domains=(
     "api.anthropic.com"
     "platform.claude.com"
+    "pypi.org"
+    "files.pythonhosted.org"
+    "registry.npmjs.org"
 )
 
 # 1. Extract Docker DNS info BEFORE any flushing
