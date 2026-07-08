@@ -1,30 +1,50 @@
 FROM mcr.microsoft.com/devcontainers/base:ubuntu24.04@sha256:4bcb1b466771b1ba1ea110e2a27daea2f6093f9527fb75ee59703ec89b5561cb
 
-# --- Bootstrap packages (needed to install Claude Code CLI) ---
+# --- Install basic development tools and iptables/ipset ---
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    curl \
-    jq \
-    # firewall networking
-    ipset \
-    iptables \
-    dnsutils \
-    aggregate \
-    && rm -rf /var/lib/apt/lists/*
+  curl \
+  jq \
+  fzf \
+  git \
+  nano \
+  vim \
+  unzip \
+  build-essential \
+  # firewall networking
+  ipset \
+  iptables \
+  dnsutils \
+  aggregate \
+  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Create directories and set ownership (combined for fewer layers)
-RUN mkdir -p /commandhistory /workspace /home/vscode/.claude && \
+ARG USERNAME=vscode
+
+# Persist bash history and set ownership (combined for fewer layers)
+RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" && \
+  mkdir -p /commandhistory /workspace /home/$USERNAME/.claude && \
   touch /commandhistory/.bash_history && \
-  touch /commandhistory/.zsh_history && \
-  chown -R vscode:vscode /commandhistory /workspace /home/vscode/.claude
+  chown -R $USERNAME:$USERNAME /commandhistory /workspace /home/$USERNAME/.claude
 
 WORKDIR /workspace
 
 # Switch to non-root user for remaining setup
-USER vscode
+USER $USERNAME
 
 # Set PATH early so claude and other user-installed binaries are available
-ENV PATH="/home/vscode/.local/bin:$PATH"
+ENV PATH="/home/$USERNAME/.local/bin:$PATH"
+
+# Set the default shell to zsh rather than sh
+ENV SHELL=/bin/zsh
+
+# Default powerline10k theme
+ARG ZSH_IN_DOCKER_VERSION=1.2.0
+RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v${ZSH_IN_DOCKER_VERSION}/zsh-in-docker.sh)" -- \
+  -p git \
+  -p fzf \
+  -a "source /usr/share/doc/fzf/examples/key-bindings.zsh" \
+  -a "source /usr/share/doc/fzf/examples/completion.zsh" \
+  -a "export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
+  -x
 
 # --- Claude Code CLI (installed as the claude user so it lands in ~/.local/bin) ---
 # This layer is intentionally placed before the common system packages so that
@@ -32,20 +52,17 @@ ENV PATH="/home/vscode/.local/bin:$PATH"
 RUN curl -fsSL https://claude.ai/install.sh | bash
 
 USER root
-RUN cp /home/vscode/.local/bin/claude /usr/local/bin/claude && \
-    chmod +x /usr/local/bin/claude
-
-# --- Common system packages ---
-# Add new packages here. Layers above (including the CLI install) stay cached.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    git \
-    vim \
-    unzip \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+RUN cp /home/$USERNAME/.local/bin/claude /usr/local/bin/claude && \
+  chmod +x /usr/local/bin/claude
 
 RUN git config --global --add safe.directory '*'
 
-USER vscode
+# Copy and set up firewall script
+COPY init-firewall.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/init-firewall.sh && \
+  echo "node ALL=(root) NOPASSWD: /usr/local/bin/init-firewall.sh" > /etc/sudoers.d/node-firewall && \
+  chmod 0440 /etc/sudoers.d/node-firewall
+
+USER $USERNAME
 
 ENV EDITOR=vim

@@ -11,7 +11,7 @@
 
   "runArgs": ["--cap-add=NET_ADMIN", "--cap-add=NET_RAW"],
 
-  "postStartCommand": "sudo bash /workspace/.devcontainer/init-firewall.sh",
+  "postStartCommand": "sudo /usr/local/bin/init-firewall.sh",
 
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=delegated",
   "workspaceFolder": "/workspace",
