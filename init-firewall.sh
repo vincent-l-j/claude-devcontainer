@@ -2,6 +2,11 @@
 set -euo pipefail  # Exit on error, undefined vars, and pipeline failures
 IFS=$'\n\t'       # Stricter word splitting
 
+allowed_domains=(
+    "api.anthropic.com"
+    "platform.claude.com"
+)
+
 # 1. Extract Docker DNS info BEFORE any flushing
 DOCKER_DNS_RULES=$(iptables-save -t nat | grep "127\.0\.0\.11" || true)
 
@@ -62,11 +67,6 @@ while read -r cidr; do
     echo "Adding GitHub range $cidr"
     ipset add allowed-domains "$cidr"
 done < <(echo "$gh_ranges" | jq -r '(.web + .api + .git)[]' | aggregate -q)
-
-allowed_domains=(
-    "api.anthropic.com"
-    "platform.claude.com"
-)
 
 # Resolve and add other allowed domains
 for domain in "${allowed_domains[@]}"; do
