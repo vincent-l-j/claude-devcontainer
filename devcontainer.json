@@ -1,5 +1,5 @@
 {
-  "name": "Claude Code (Podman)",
+  "name": "Claude Code (Docker)",
   "build": {
     "dockerfile": "Dockerfile",
     "context": "."
