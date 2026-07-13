@@ -75,6 +75,8 @@ The firewall is (re-)applied via `sudo init-firewall.sh` every time the containe
 
 Claude's configuration and settings are stored in a named Docker volume (`devc-<folder-name>-config-<container-id>`), not inside the container filesystem. This means your Claude settings survive container rebuilds and image updates. Shell command history is similarly persisted in its own named volume, so it survives rebuilds too.
 
+By default, Claude Code splits its state between `~/.claude/` and a separate `~/.claude.json` file, but only `~/.claude/` is backed by the persistent volume above. `containerEnv.CLAUDE_CONFIG_DIR` is set to `/home/vscode/.claude`, which redirects all of Claude's state (including what would otherwise land in `~/.claude.json`) into that single mounted directory — so login/auth persists across rebuilds without needing a second volume.
+
 ### Auto-updates and telemetry
 
 `DISABLE_AUTOUPDATER=1` and `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1` are set by default. Claude Code will not auto-update inside the container and non-essential network traffic (telemetry, update checks) is suppressed.
