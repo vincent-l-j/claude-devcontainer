@@ -29,8 +29,6 @@ Download and install Rancher Desktop: https://rancherdesktop.io — a free, open
 
 On first launch, in Rancher Desktop's preferences, set the **Container Engine** to **dockerd (moby)** (not `containerd`). This gives you a Docker-compatible engine and CLI, so no VS Code settings changes are needed — the Dev Containers extension detects it the same way it detects Docker Desktop.
 
-> Podman was evaluated as an option here previously and dropped due to rootless/rootful file-ownership issues on macOS and Windows. See [`docs/why-not-podman.md`](docs/why-not-podman.md) if that history is useful context.
-
 ---
 
 ## Using the container
