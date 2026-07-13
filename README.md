@@ -63,6 +63,8 @@ All other outbound internet access is blocked. If a tool or script tries to reac
 
 The `NET_ADMIN`/`NET_RAW` capabilities used by the firewall are scoped to the container's own network namespace and grant no privilege on your host.
 
+The firewall is (re-)applied via `sudo init-firewall.sh` every time the container starts (`postStartCommand`). The `vscode` user's passwordless `sudo` is locked down to exactly that one script (`/usr/local/bin/init-firewall.sh`) — the base image's default blanket passwordless sudo for `vscode` is removed, so any other `sudo` command prompts for a password.
+
 ### Included tooling
 
 - **Node.js** (via the `node` dev container feature, installed through nvm) and **Python 3** are both preinstalled, so `npm` and `pip`/`python3` work out of the box against the allowlisted registries above.
