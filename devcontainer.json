@@ -18,7 +18,6 @@
 
   "mounts": [
     "source=devc-${localWorkspaceFolderBasename}-bashhistory-${devcontainerId},target=/commandhistory,type=volume",
-    "source=${localWorkspaceFolder}/.devcontainer,target=/workspace/.devcontainer,type=bind,readonly",
     "source=devc-${localWorkspaceFolderBasename}-config-${devcontainerId},target=/home/vscode/.claude,type=volume"
   ],
 
