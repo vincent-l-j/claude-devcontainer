@@ -8,6 +8,7 @@ allowed_domains=(
     "pypi.org"
     "files.pythonhosted.org"
     "registry.npmjs.org"
+    "binaries.soliditylang.org"
 )
 
 # 1. Extract Docker DNS info BEFORE any flushing
