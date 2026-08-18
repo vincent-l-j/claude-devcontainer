@@ -10,9 +10,9 @@ Install these once on your machine.
 
 **Required for everyone:**
 
-| Tool | Download |
-|------|----------|
-| VS Code | https://code.visualstudio.com |
+| Tool                             | Download                                                                                                                                  |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| VS Code                          | https://code.visualstudio.com                                                                                                             |
 | VS Code Dev Containers extension | Search "Dev Containers" in VS Code Extensions, or: https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers |
 
 **Then choose one container runtime:**
@@ -52,12 +52,12 @@ On first launch, in Rancher Desktop's preferences, set the **Container Engine** 
 
 A firewall runs automatically on every container start and restricts outbound traffic to a fixed allowlist:
 
-| Service | Purpose |
-|---------|---------|
-| `api.anthropic.com`, `platform.claude.com` | Claude Code |
-| GitHub IP ranges | Git operations |
-| `pypi.org`, `files.pythonhosted.org` | Python package installs (`pip`) |
-| `registry.npmjs.org` | Node.js package installs (`npm`) |
+| Service                                    | Purpose                          |
+| ------------------------------------------ | -------------------------------- |
+| `api.anthropic.com`, `platform.claude.com` | Claude Code                      |
+| GitHub IP ranges                           | Git operations                   |
+| `pypi.org`, `files.pythonhosted.org`       | Python package installs (`pip`)  |
+| `registry.npmjs.org`                       | Node.js package installs (`npm`) |
 
 All other outbound internet access is blocked. If a tool or script tries to reach an unlisted host it will be rejected immediately (ICMP admin-prohibited).
 
